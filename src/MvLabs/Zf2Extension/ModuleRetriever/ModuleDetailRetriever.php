@@ -1,7 +1,9 @@
 <?php
 namespace MvLabs\Zf2Extension\ModuleRetriever;
 
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\Mvc\Application;
+
 /**
  * Description of ModuleRetriever
  *
@@ -38,20 +40,21 @@ class ModuleDetailRetriever
     /**
      * Retrieve the module path
      * @param string $moduleName
+     * @return null
      */
     public function getModulePath($moduleName)
     {
+        $path = null;
+
         if (array_key_exists($moduleName, $this->loadedModules)) {
+            $module = $this->loadedModules[$moduleName];
 
-              $module = $this->loadedModules[$moduleName];
-              $moduleConfig = $module->getAutoloaderConfig();
-
-               return $moduleConfig[self::STANDARD_AUTOLOLOADER][self::NAMESPACE_KEY][$moduleName];
-
+            if ($module instanceof AutoloaderProviderInterface) {
+                $moduleConfig = $module->getAutoloaderConfig();
+                $path = $moduleConfig[self::STANDARD_AUTOLOLOADER][self::NAMESPACE_KEY][$moduleName];
+            }
         }
 
-        return null;
-
+        return $path;
     }
-
 }
